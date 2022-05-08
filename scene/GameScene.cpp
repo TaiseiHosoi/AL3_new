@@ -32,6 +32,34 @@ void GameScene::Initialize() {
 
 	//ライン描画
 	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());
+	
+	//X,Y,Z方向のスケーリングを設定
+	worldTransform_.scale_ = {1.0,1.0,1.0};
+	//スケーリング行列を宣言
+	Matrix4 matScale;
+
+	matScale.m[0][0] = 2.0f;
+	matScale.m[0][1] = 0.0f;
+	matScale.m[0][2] = 0.0f;
+	matScale.m[0][3] = 0.0f;
+
+	matScale.m[1][0] = 0.0f;
+	matScale.m[1][1] = 2.0f;
+	matScale.m[1][2] = 2.0f;
+	matScale.m[1][3] = 2.0f;
+
+	matScale.m[2][0] = 0.0f;
+	matScale.m[2][1] = 0.0f;
+	matScale.m[2][2] = 2.0f;
+	matScale.m[2][3] = 0.0f;
+
+	matScale.m[3][0] = 0.0f;
+	matScale.m[3][1] = 0.0f;
+	matScale.m[3][2] = 0.0f;
+	matScale.m[3][3] = 2.0f;
+
+	
+
 }
 
 void GameScene::Update() { debugCamera_->Update(); }
