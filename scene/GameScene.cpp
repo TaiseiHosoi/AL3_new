@@ -1,15 +1,18 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
-#include "PrimitiveDrawer.h"
-#include "AxisIndicator.h"
-#include"DebugCamera.h"
+#include <random>
+
+using namespace DirectX;
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() { 
+GameScene::~GameScene() {
+	// delete sprite_;
 	delete model_;
-	delete debugCamera_; }
+
+	delete player_;
+}
 
 void GameScene::Initialize() {
 
@@ -17,52 +20,58 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
-	debugCamera_ = new DebugCamera(1280, 720);
+
+	
 
 	textureHandle_ = TextureManager::Load("mario.jpg");
-
+	// sprite_ = Sprite::Create(textureHandle_, { 100,50 });
 	model_ = Model::Create();
-	worldTransform_.Initialize();
+	
+
+	//ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 
-	//軸方向表示有効
-	AxisIndicator::GetInstance()->SetVisible(true);
-	//軸方向表示
-	AxisIndicator::GetInstance()->SetTargetViewProjection(&debugCamera_->GetViewProjection());
+	//自キャラの生成
+	player_ = new Player();
+	//自キャラの初期化
+	player_->Initialize(model_, textureHandle_);
 
-	//ライン描画
-	PrimitiveDrawer::GetInstance()->SetViewProjection(&debugCamera_->GetViewProjection());
-	
-	//X,Y,Z方向のスケーリングを設定
-	worldTransform_.scale_ = {1.0,1.0,1.0};
-	//スケーリング行列を宣言
-	Matrix4 matScale;
-
-	matScale.m[0][0] = 2.0f;
-	matScale.m[0][1] = 0.0f;
-	matScale.m[0][2] = 0.0f;
-	matScale.m[0][3] = 0.0f;
-
-	matScale.m[1][0] = 0.0f;
-	matScale.m[1][1] = 2.0f;
-	matScale.m[1][2] = 2.0f;
-	matScale.m[1][3] = 2.0f;
-
-	matScale.m[2][0] = 0.0f;
-	matScale.m[2][1] = 0.0f;
-	matScale.m[2][2] = 2.0f;
-	matScale.m[2][3] = 0.0f;
-
-	matScale.m[3][0] = 0.0f;
-	matScale.m[3][1] = 0.0f;
-	matScale.m[3][2] = 0.0f;
-	matScale.m[3][3] = 2.0f;
-
-	
-
+	//音声再生
+	// audio_->PlayWave(soundDataHandle_);
 }
 
-void GameScene::Update() { debugCamera_->Update(); }
+void GameScene::Update() {
+	//スプライトの今の座標を取得
+	// XMFLOAT2 position = sprite_->GetPosition();
+	//座標を｛２，０｝移動
+	// position.x += 2.0f;
+	// position.y += 1.0f;
+
+	//自キャラの更新
+	player_->Update();
+	
+
+	
+
+	//行列の再計算
+	viewProjection_.UpdateMatrix();
+
+	//デバッグ用表示
+	debugText_->SetPos(50, 50);
+	debugText_->Printf(
+	  "eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
+
+	debugText_->SetPos(50, 70);
+	debugText_->Printf(
+	  "target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y,
+	  viewProjection_.target.z);
+
+	debugText_->SetPos(50, 90);
+	debugText_->Printf(
+	  "up:(%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
+
+	
+}
 
 void GameScene::Draw() {
 
@@ -86,13 +95,12 @@ void GameScene::Draw() {
 #pragma region 3Dオブジェクト描画
 	// 3Dオブジェクト描画前処理
 	Model::PreDraw(commandList);
-	model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), textureHandle_);
+
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	for (int i = 0; i < 12; i++) {
-		PrimitiveDrawer::GetInstance()->DrawLine3d(vertex[c_[i][0]], vertex[c_[i][1]],Vector4(1,1,1,1));
-	}
+
+	player_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -105,6 +113,9 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	
+
+	
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);

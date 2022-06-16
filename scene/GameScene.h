@@ -1,15 +1,16 @@
 ﻿#pragma once
 
 #include "Audio.h"
-#include "DirectXCommon.h"
 #include "DebugText.h"
+#include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
+#include "Player.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include"DebugCamera.h"
+#include <DirectXMath.h>
 
 /// <summary>
 /// ゲームシーン
@@ -47,42 +48,27 @@ class GameScene {
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	DebugText* debugText_ = nullptr;
-	DebugCamera* debugCamera_ = nullptr;
-	uint32_t textureHandle_ = 0;
+	uint32_t textureHandle_ = 0; //テクスチャハンドル
+	uint32_t soundDataHandle_ = 0;
+	uint32_t voiceHandle_ = 0;
+	//自キャラ
+	Player* player_ = nullptr;
+
+	//カメラ上方向の角度
+	float viewAngle = 0.0f;
+
+	//スプライト
+	Sprite* sprite_ = nullptr;
 	Model* model_ = nullptr;
 
+	//ワールドトランスフォーム初期化
 	WorldTransform worldTransform_;
 
+	//ビュープロジェクション初期化
 	ViewProjection viewProjection_;
-	
 
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
-	Vector3 vertex[8] = {
-	  {0.0f, 0.0f, 0.0f},
-      {5.0f, 0.0f, 0.0f},
-      {5.0f, 0.0f, 5.0f},
-      {0.0f, 0.0f, 5.0f},
-      {0.0f, 5.0f, 0.0f},
-      {5.0f, 5.0f, 0.0f},
-      {5.0f, 5.0f, 5.0f},
-      {0.0f, 5.0f, 5.0f}
-    };
-
-	int c_[12][2] = {
-	  {0, 1},
-      {1, 2},
-      {2, 3},
-      {3, 0},
-      {0, 4},
-      {4, 5},
-	  {5, 6},
-      {6, 7},
-      {7, 4},
-      {3, 7},
-      {6, 2},
-      {1, 5}
-    };
+	///
 };
-
