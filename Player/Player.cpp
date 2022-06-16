@@ -27,10 +27,7 @@ void Player::Initialize(Model* model, uint32_t &textureHandle) {
 
 	worldTransform_.Initialize();
 	
-
-	
-
-		// X,Y,Z方向スケーリング設定
+	// X,Y,Z方向スケーリング設定
 	worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
 	worldTransform_.translation_ = {1.0f, 1.0f, 1.0f};
 
